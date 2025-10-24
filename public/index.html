@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HISTÓRICO ALFARNATE — Rango de fechas</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HISTORICO ALFARNATE</title>
     <style>
       :root { --bg:#0b0f14; --card:#121821; --ink:#e8eef7; --muted:#9fb0c6; --accent:#6ec1ff; --line:#223042; }
       * { box-sizing: border-box; }
-      body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans'; background:var(--bg); color:var(--ink); }
+      body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; background:var(--bg); color:var(--ink); }
       header { padding: 20px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #0b0f14, #0b0f14e0); position: sticky; top:0; z-index: 5; }
       h1 { margin:0; font-size: clamp(20px, 3vw, 28px); text-align:center; }
       .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
@@ -22,36 +22,48 @@
       .kpi { background:#0d131b; border:1px dashed var(--line); padding:12px; border-radius:10px; }
       .kpi b { display:block; font-size:12px; color: var(--muted); }
       .kpi span { font-size:22px; display:block; margin-top:4px; }
+      .table-shell {
+        border-radius:12px;
+        background:#0d131b;
+        margin-top:16px;
+      }
+      table { width:100%; border-collapse: collapse; }
+      thead th { 
+        position: sticky; 
+        top: 80px;  /* altura ajustada del header en escritorio */
+        background:#101722; 
+        z-index: 10; 
+        box-shadow: 0 2px 3px rgba(0,0,0,0.4);
+      }
+      th, td { border-bottom: 1px solid #172333; text-align:left; padding:8px 10px; font-size: 13px; }
+      tr:hover td { background:#0f1621; }
+      .foot { margin-top: 12px; color: var(--muted); font-size: 12px; }
       .row { display:flex; gap:10px; }
       .row > * { flex:1; }
-      .table-shell{ border-radius:12px; background:#0d131b; margin-top:16px; }
-      table{ width:100%; border-collapse:collapse; }
-      thead th{ position:sticky; top: 80px; background:#101722; z-index:10; box-shadow:0 2px 3px rgba(0,0,0,.4); }
-      th, td{ border-bottom:1px solid #172333; text-align:left; padding:8px 10px; font-size:13px; }
-      tr:hover td{ background:#0f1621; }
-      .foot{ margin-top: 12px; color: var(--muted); font-size: 12px; }
-      @media (max-width: 800px){ .form{ grid-template-columns:1fr; } thead th{ top:140px; } .kpigrid{ grid-template-columns:1fr; } }
+      @media (max-width: 800px){
+        .form { grid-template-columns: 1fr; }
+        .kpigrid { grid-template-columns: 1fr; }
+        thead th { top: 140px; } /* header más alto en móvil */ 
+      }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   </head>
   <body>
     <header>
-      <div class="wrap"><h1>HISTÓRICO ALFARNATE — Rango de fechas</h1></div>
+      <div class="wrap">
+        <h1>HISTORICO ALFARNATE</h1>
+      </div>
     </header>
     <main class="wrap">
       <div class="card">
         <div class="form">
           <input id="stationId" value="IALFAR32" type="hidden" />
           <div>
-            <label for="start">Desde (YYYY-MM-DD)</label>
-            <input id="start" type="date" />
-          </div>
-          <div>
-            <label for="end">Hasta (YYYY-MM-DD)</label>
-            <input id="end" type="date" />
+            <label for="date">Fecha (YYYY-MM-DD)</label>
+            <input id="date" type="date" />
           </div>
           <div class="row">
-            <button id="loadRangeBtn" class="primary">Cargar rango</button>
+            <button id="loadBtn" class="primary">Cargar datos</button>
             <button id="csvBtn">Exportar CSV</button>
             <button id="xlsxBtn">Exportar Excel</button>
           </div>
@@ -70,152 +82,31 @@
             <thead>
               <tr>
                 <th>Hora local</th>
-                <th>Temp (°C)</th>
-                <th>P. rocío (°C)</th>
-                <th>Humedad (%)</th>
-                <th>Presión (hPa)</th>
-                <th>Viento (km/h)</th>
-                <th>Ráfaga (km/h)</th>
-                <th>Dir (°)</th>
-                <th>Precip. Rate (mm)</th>
-                <th>Precip. Acum. (mm)</th>
-                <th>UV</th>
-                <th>Rad (W/m²)</th>
+    <th>Temp (°C)</th>
+    <th>P. rocío (°C)</th>
+    <th>Humedad (%)</th>
+    <th>Presión (hPa)</th>
+    <th>Viento (km/h)</th>
+    <th>Ráfaga (km/h)</th>
+    <th>Dir (°)</th>
+    <th>Precip. Rate (mm)</th>
+    <th>Precip. Acum. (mm)</th>
+    <th>UV</th>
+    <th>Rad (W/m²)</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
-        <div class="foot">Exporta como CSV (separador ;) o Excel (.xlsx). Soporta carga por rango de fechas día a día.</div>
+        <div class="foot">
+          Exporta como CSV (con separador ;) o Excel (.xlsx) para abrir en Excel sin problemas.
+        </div>
       </div>
       <div style="margin:20px; text-align:center;">
         <button class="primary" onclick="history.back()">⬅ Volver</button>
       </div>
     </main>
-
     <script>
-      // === ⚙️ CONFIGURA TU ORIGEN DE DATOS AQUÍ ===
-      // Si ya tienes un endpoint por DÍA, rellena buildURL() para que devuelva la URL
-      // de ese día (ej: 'https://tu-api/IALFAR32/2024-03-01.json').
-      // Si tienes un endpoint por RANGO, puedes sustituir fetchRangeData() para hacer una única llamada.
-
-      const DEMO_FALLBACK = true; // Si el fetch real falla, genera datos de demo y continúa.
-
-      function buildURL(stationId, isoDate){
-        // TODO: Cambia esto por tu endpoint REAL por día.
-        // return `https://tu-servidor/estaciones/${stationId}/historico/${isoDate}.json`;
-        return null; // null => no hay endpoint configurado y se usará el modo demo si está activo.
-      }
-
-      async function fetchDayData(stationId, isoDate){
-        const url = buildURL(stationId, isoDate);
-        if(!url){
-          if (DEMO_FALLBACK) return demoDataForDate(isoDate);
-          throw new Error("No hay URL configurada para el día " + isoDate);
-        }
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Error ${res.status} al cargar ${isoDate}`);
-        const data = await res.json();
-        // Normaliza: devuelve un array de objetos con las claves esperadas.
-        return normalizeIncomingData(data);
-      }
-
-      // Si tienes un endpoint por RANGO, reemplaza esta función para devolver un único array normalizado
-      // entre startIso y endIso. Por defecto, iterará día a día.
-      async function fetchRangeData(stationId, startIso, endIso, onProgress){
-        const days = enumerateDays(startIso, endIso);
-        let all = [];
-        let done = 0;
-        for (const d of days){
-          try {
-            const rows = await fetchDayData(stationId, d);
-            all.push(...rows);
-          } catch(err){
-            console.warn("Falló el día", d, err);
-          }
-          done++;
-          if (onProgress) onProgress(done, days.length, d);
-        }
-        return all;
-      }
-
-      // === 🧰 Utilidades ===
-      function enumerateDays(startIso, endIso){
-        const out = [];
-        let d = new Date(startIso);
-        const end = new Date(endIso);
-        while (d <= end){
-          out.push(d.toISOString().slice(0,10));
-          d.setDate(d.getDate()+1);
-        }
-        return out;
-      }
-
-      function normalizeIncomingData(data){
-        // Intenta detectar estructuras comunes y mapearlas a las columnas esperadas
-        // Estructura esperada por fila:
-        // { localTime, tempC, dewpointC, humidity, pressure_hPa, wind_kmh, gust_kmh, dir_deg, precip_rate_mm, precip_accum_mm, uv, rad_wm2 }
-        if (Array.isArray(data)){
-          return data.map(r => ({
-            localTime: r.localTime || r.time || r.timestamp || r.fecha || r.datetime,
-            tempC: n(r.tempC ?? r.temp ?? r.temperature ?? r.t),
-            dewpointC: n(r.dewpointC ?? r.dewpoint ?? r.dp),
-            humidity: n(r.humidity ?? r.hum ?? r.RH),
-            pressure_hPa: n(r.pressure_hPa ?? r.pressure ?? r.p),
-            wind_kmh: n(r.wind_kmh ?? r.wind ?? r.ws),
-            gust_kmh: n(r.gust_kmh ?? r.gust ?? r.wg),
-            dir_deg: n(r.dir_deg ?? r.dir ?? r.wd),
-            precip_rate_mm: n(r.precip_rate_mm ?? r.precipRate ?? r.pr),
-            precip_accum_mm: n(r.precip_accum_mm ?? r.precipAcc ?? r.pa ?? r.rain),
-            uv: n(r.uv ?? r.UV),
-            rad_wm2: n(r.rad_wm2 ?? r.radiation ?? r.solar)
-          })).filter(x => x.localTime);
-        }
-        return [];
-      }
-      const n = v => v==null || v==="" ? null : Number(v);
-
-      function renderTable(rows){
-        // Ordena por fecha ascendente
-        rows.sort((a,b)=> new Date(a.localTime) - new Date(b.localTime));
-        const tbody = document.querySelector('#dataTable tbody');
-        tbody.innerHTML = '';
-        const fmt = (v)=> v==null || Number.isNaN(v) ? '' : String(v);
-        for (const r of rows){
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${escapeHtml(formatLocal(r.localTime))}</td>
-            <td>${fmt(r.tempC)}</td>
-            <td>${fmt(r.dewpointC)}</td>
-            <td>${fmt(r.humidity)}</td>
-            <td>${fmt(r.pressure_hPa)}</td>
-            <td>${fmt(r.wind_kmh)}</td>
-            <td>${fmt(r.gust_kmh)}</td>
-            <td>${fmt(r.dir_deg)}</td>
-            <td>${fmt(r.precip_rate_mm)}</td>
-            <td>${fmt(r.precip_accum_mm)}</td>
-            <td>${fmt(r.uv)}</td>
-            <td>${fmt(r.rad_wm2)}</td>`;
-          tbody.appendChild(tr);
-        }
-      }
-
-      function updateKPIs(rows){
-        const temps = rows.map(r=>r.tempC).filter(v=>v!=null && !Number.isNaN(v));
-        document.getElementById('kpiCount').textContent = rows.length.toLocaleString();
-        document.getElementById('kpiMin').textContent = temps.length? Math.min(...temps).toFixed(1) : '—';
-        document.getElementById('kpiMax').textContent = temps.length? Math.max(...temps).toFixed(1) : '—';
-      }
-
-      function setStatus(msg){ document.getElementById('status').textContent = msg; }
-      function formatLocal(x){
-        const d = new Date(x);
-        if (Number.isNaN(d.getTime())) return x;
-        return d.toLocaleString();
-      }
-      function escapeHtml(s){ return (s+"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
-
-      // === CSV/XLSX export (a partir de la tabla) ===
       document.getElementById("csvBtn").addEventListener("click", () => {
         const table = document.getElementById("dataTable");
         let rows = [];
@@ -238,63 +129,1131 @@
       });
       function descarga(url, filename){
         const a = document.createElement("a");
-        a.href = url; a.download = filename; document.body.appendChild(a); a.click(); URL.revokeObjectURL(url); a.remove();
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
       }
-      function limpiarTexto(t){ return (t || "").toString().replace(/\r?\n|\r/g, " ").trim(); }
-      function escaparCSV(val){ const s = String(val ?? ""); const needsQuotes = /[;"\n]/.test(s); const escaped = s.replace(/"/g, '""'); return needsQuotes ? `"${escaped}"` : escaped; }
-
-      // === Control principal ===
-      document.getElementById('loadRangeBtn').addEventListener('click', async () => {
-        const stationId = document.getElementById('stationId').value || 'IALFAR32';
-        const s = document.getElementById('start').value;
-        const e = document.getElementById('end').value;
-        if (!s || !e) { setStatus('Elige fecha de inicio y fin'); return; }
-        if (new Date(s) > new Date(e)) { setStatus('La fecha inicio no puede ser mayor que la fecha fin'); return; }
-        setStatus('Cargando…');
-        try {
-          const rows = await fetchRangeData(stationId, s, e, (done, total, d)=> setStatus(`Cargando ${done}/${total} — ${d}`));
-          // Limpia duplicados por marca temporal si llegan varios por el mismo instante
-          const dedup = new Map();
-          for (const r of rows){ if (!r.localTime) continue; const k = new Date(r.localTime).toISOString(); if (!dedup.has(k)) dedup.set(k, r); }
-          const clean = Array.from(dedup.values());
-          renderTable(clean);
-          updateKPIs(clean);
-          setStatus(`Listo — ${clean.length.toLocaleString()} registros`);
-        } catch (err){
-          console.error(err); setStatus('Error: ' + err.message);
-        }
-      });
-
-      // === DEMO: genera datos sintéticos si no hay endpoint configurado ===
-      function demoDataForDate(iso){
-        // genera lecturas cada 30 minutos
-        const base = new Date(iso + 'T00:00:00');
-        const out = [];
-        for (let i=0;i<48;i++){
-          const t = new Date(base.getTime() + i*30*60*1000);
-          const hour = t.getHours();
-          const temp = 10 + 8*Math.sin((hour/24)*Math.PI*2) + (Math.random()*1.5-0.75);
-          const hum = 55 + 25*Math.cos((hour/24)*Math.PI*2) + (Math.random()*5-2.5);
-          out.push({
-            localTime: t.toISOString(),
-            tempC: Number(temp.toFixed(1)),
-            dewpointC: Number((temp - (100-hum)/5).toFixed(1)),
-            humidity: Number(hum.toFixed(0)),
-            pressure_hPa: Number((1013 + Math.random()*4-2).toFixed(1)),
-            wind_kmh: Number((5 + Math.random()*20).toFixed(1)),
-            gust_kmh: Number((8 + Math.random()*28).toFixed(1)),
-            dir_deg: Number((Math.random()*360).toFixed(0)),
-            precip_rate_mm: 0,
-            precip_accum_mm: 0,
-            uv: Math.max(0, Math.round(8*Math.sin((hour/24)*Math.PI))),
-            rad_wm2: Math.max(0, Math.round(900*Math.sin((hour/24)*Math.PI)))
-          });
-        }
-        return out;
+      function limpiarTexto(t){
+        return (t || "").toString().replace(/\r?\n|\r/g, " ").trim();
+      }
+      function escaparCSV(val){
+        const s = String(val ?? "");
+        const needsQuotes = /[;"\n]/.test(s);
+        const escaped = s.replace(/"/g, '""');
+        return needsQuotes ? `"${escaped}"` : escaped;
       }
     </script>
+    <script src="./app.js"></script>
   </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
