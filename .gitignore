@@ -1,0 +1,11 @@
+.env
+node_modules
+npm-debug.log*
+.DS_Store
+
+# backups locales\+mirrors
+viejo-backup/
+viejo-mirror.git/
+
+# Ignorar nombres reservados en Windows
+nul
