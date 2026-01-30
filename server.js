@@ -28,13 +28,14 @@ function envBool(keys, defaultValue=false) {
 
 
 const DATABASE_URL = envFirst(["DATABASE_URL","URL_DE_LA_BASE_DE_DATOS","URL DE LA BASE DE DATOS"]);
-// Pool solo si hay DB configurada (no rompe nada si no está)
+
 const pool = DATABASE_URL
   ? new pg.Pool({
       connectionString: DATABASE_URL,
-      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+      ssl: { rejectUnauthorized: false }, // <- SIEMPRE SSL en Railway
     })
   : null;
+
 
 async function initDb() {
   if (!pool) return;
